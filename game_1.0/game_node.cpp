@@ -1,6 +1,5 @@
 typedef struct GameNode{
-	int rownum;
-	int colnum;
+	int index;
 	int player;
 	int count;
 	struct GameNode* up;
@@ -11,27 +10,6 @@ typedef struct GameNode{
 
 typedef GNode* GNodeptr;
 #define GBOX (GNode*)malloc(sizeof(GNode))
-
-int* createBoard(int gameSize, int* board, &gMap){
-	GNodeptr unode, dnode, lnode, rnode;
-	for(int i=0; i<gameSize; i++){
-		if(i%gameSize == 0) unode = NULL;
-		for(int j=0; j<gameSize; j++){
-			if(j%gameSize == 0) lnode = NULL;
-			board[i][j][1] = 0;
-			GNodeptr node = GBOX;
-			node->rownum = i;
-			node->colnum = j;
-			node->player = 0;
-			node->count = 0;
-			node->up = NULL;
-			node->down = NULL;
-			node->left = NULL;
-			node->right = NULL;
-			gMap[i][j]
-		}
-	}
-}
 
 /*
 -------------------------------

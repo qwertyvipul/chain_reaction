@@ -20,6 +20,24 @@ PNodeptr createPlayers(int playerCount){
 			temp->next = node;
 		}
 		temp = node;
+		if(player==playerCount) node->next = head;
 	}
 	return head;
+}
+
+char getPlayerName(int player){
+	switch(player){
+		case 1:
+			return 'A';
+			break;
+		case 2:
+			return 'B';
+			break;
+		case 3:
+			return 'C';
+			break;
+		case 4:
+			return 'D';
+			break;
+	}
 }
