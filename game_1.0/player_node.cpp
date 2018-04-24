@@ -1,5 +1,6 @@
 typedef struct PlayerNode{
 	int player;
+	struct PlayerNode* prev;
 	struct PlayerNode* next;
 }PNode;
 
@@ -13,11 +14,13 @@ PNodeptr createPlayers(int playerCount){
 		PNodeptr node = PBOX;
 		node->player = player;
 		node->next = NULL;
+		node->prev = NULL;
 		if(flag){
 			head = node;
 			flag = 0;
 		}else{
 			temp->next = node;
+			node->prev = temp;
 		}
 		temp = node;
 		if(player==playerCount) node->next = head;
