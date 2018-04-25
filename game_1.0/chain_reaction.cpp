@@ -1,5 +1,5 @@
 class ChainReaction{
-	public:
+	public: //Yes I know, but can't resist the easy way ;-)
 		int gameSize;
 		int playerCount;
 		GMap gmap;
