@@ -2,6 +2,7 @@ typedef struct GameNode{
 	int index;
 	int player;
 	int count;
+	int total;
 	struct GameNode* up;
 	struct GameNode* down;
 	struct GameNode* left;

@@ -30,12 +30,12 @@ int main(){
 	ChainReaction chainReaction(gameSize, playerCount);
 	chainReaction.createGame();
 	//chainReaction.printGame();
-	chainReaction.play();
+	//chainReaction.play();
 	
 	
+	//chainReaction.printRawNodeCount(); //to check if all the node counts were correct
 	//chainReaction.printRawGame(); //to print the layout of the board
-	//just a check if the map was successfully created
-	//for(int i=0; i<gameSize*gameSize; i++){cout<<chainReaction.gmap[i]<<endl;}
+	//for(int i=0; i<gameSize*gameSize; i++){cout<<chainReaction.gmap[i]<<endl;} //just a check if the map was successfully created
 	
 	/*
 	----------------
