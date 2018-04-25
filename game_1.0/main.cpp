@@ -11,12 +11,13 @@ typedef map<int, GNodeptr> GMap;
 #include "chain_reaction.cpp"
 
 int main(){
+	system("Color F0");
 	int gameSize, playerCount;
 	int flag=1;
 	
 	while(flag){
-		cout<<"Enter the size of the game (5-10): "; cin>>gameSize;
-		if(gameSize>=5 && gameSize<=10) flag=0;
+		cout<<"Enter the size of the game (2-10): "; cin>>gameSize;
+		if(gameSize>=2 && gameSize<=10) flag=0;
 		else cout<<"Opps! Invalid size, please try again"<<endl;
 	}
 
@@ -30,20 +31,21 @@ int main(){
 	ChainReaction chainReaction(gameSize, playerCount);
 	chainReaction.createGame();
 	//chainReaction.printGame();
-	//chainReaction.play();
+	chainReaction.play();
 	
 	
 	//chainReaction.printRawNodeCount(); //to check if all the node counts were correct
 	//chainReaction.printRawGame(); //to print the layout of the board
 	//for(int i=0; i<gameSize*gameSize; i++){cout<<chainReaction.gmap[i]<<endl;} //just a check if the map was successfully created
-	
-	/*
-	----------------
-	|00|01|02|03|04|
-	|05|06|07|08|09|
-	|10|11|12|13|14|
-	|15|16|17|18|19|
-	|20|21|22|23|24|
-	----------------
-	*/
 }
+
+/*
+-----------
+| 00 | 00 |
+| 00 | 00 |
+-----------
+| 00 | 00 |
+| 00 | 00 |
+-----------
+xxxxxxxxxxx
+*/

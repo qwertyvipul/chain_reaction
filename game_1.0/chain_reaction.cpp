@@ -15,7 +15,12 @@ class ChainReaction{
 		void play();
 		void markIndex(PNodeptr, int);
 		int gameLeft();
-		int playerLeft();
+		int playerLeft(PNodeptr);
+		void burstNode(GNodeptr);
+		void burstLeft(GNodeptr, PNodeptr);
+		void burstRight(GNodeptr, PNodeptr);
+		void burstUp(GNodeptr, PNodeptr);
+		void burstDown(GNodeptr, PNodeptr);
 };
 
 ChainReaction::ChainReaction(int gameSize, int playerCount){
@@ -34,8 +39,9 @@ void ChainReaction::createGame(){
 			GNodeptr node = GBOX;
 			gmap[index] = node;
 			node->index = index;
-			node->player = 0;
+			node->player = NULL;
 			node->count = 0;
+			node->total = 0;
 			if(rownum==0){
 				node->up = NULL;
 			}else{
@@ -65,7 +71,7 @@ void ChainReaction::play(){
 	PNodeptr pnode = this->firstPlayer;
 	do{
 		this->printGame();
-		cout<<"Player "<<getPlayerName(pnode->player)<<" please enter your index: ";
+		cout<<"Player "<<getPlayerName(pnode->pnum)<<" please enter your index: ";
 		int index;
 		cin>>index;
 		while(index>=this->gameSize*this->gameSize || this->gmap[index]->player!=0){
@@ -77,21 +83,29 @@ void ChainReaction::play(){
 	
 	//the game has already begun!!!
 	do{
-		if(this->playerLeft()){
+		if(this->playerLeft(pnode)){
 			this->printGame();
-			cout<<"Player "<<getPlayerName(pnode->player)<<" please enter your index: ";
+			cout<<"Player "<<getPlayerName(pnode->pnum)<<" please enter your index: ";
 			int index;
 			cin>>index;
-			while(index>=this->gameSize*this->gameSize || this->gmap[index]->count == this->gmap[index]->total || this->gmap[index]->player!=pnode){
+			while(index>=this->gameSize*this->gameSize || this->gmap[index]->count == this->gmap[index]->total || (this->gmap[index]->player!=NULL && this->gmap[index]->player!=pnode)){
 				cout<<"Please choose a valid index: "; cin>>index;
 			}
 			this->markIndex(pnode, index);
 			pnode = pnode->next;
 		}else{
+			cout<<"Opps Player "<<getPlayerName(pnode->pnum)<<" you have been knocked out of the game."<<endl;
+			pnode->next->prev = pnode->prev;
+			pnode->prev->next = pnode->next;
+			pnode = pnode->next;
 			
+			if(pnode->next == pnode){
+				cout<<"Hurrah! Player "<<getPlayerName(pnode->pnum)<<" has won the game."<<endl;
+				return;
+			}
 		}
 	}while(this->gameLeft());
-	cout<<"Hurrah! "<<getPlayerName(pnode->prev->player)<<" has won the game."<<endl;
+	//cout<<"Hurrah! "<<getPlayerName(pnode->prev->pnum)<<" has won the game."<<endl;
 	//this->printGame();
 }
 
@@ -103,15 +117,24 @@ int ChainReaction::gameLeft(){
 	return 0;
 }
 
+int ChainReaction::playerLeft(PNodeptr pnode){
+	for(int index=0; index<this->gameSize*this->gameSize; index++){
+		if(this->gmap[index]->player == pnode) return 1;
+	}
+	return 0;
+}
+
 
 void ChainReaction::markIndex(PNodeptr pnode, int index){
 	GNodeptr gnode = this->gmap[index];
-	gnode->player = pnode->player;
+	gnode->player = pnode;
 	gnode->count++;
+	
+	if(gnode->count == gnode->total) this->burstNode(gnode);
 }
 
 void ChainReaction::printGame(){
-	for(int i=0; i<(this->gameSize*2 + this->gameSize+1); i++){
+	for(int i=0; i<(this->gameSize)*5+1; i++){
 		cout<<"-";
 	}
 	cout<<endl;
@@ -119,17 +142,28 @@ void ChainReaction::printGame(){
 		cout<<"|";
 		for(int colnum=0; colnum<this->gameSize; colnum++){
 			int index = rownum*gameSize+colnum;
+			if(index/10==0) cout<<" 0";
+			else cout<<" ";
+			cout<<index<<" |";
+		}
+		cout<<endl;
+		cout<<"|";
+		for(int colnum=0; colnum<this->gameSize; colnum++){
+			int index = rownum*gameSize+colnum;
 			GNodeptr node = this->gmap[index];
-			if(node->player == 0){
-				if(index/10==0) cout<<"0";
-				cout<<index<<"|";
+			if(node->player == NULL){
+				cout<<" 00 |";
 			}else{
-				cout<<getPlayerName(node->player)<<node->count<<"|";
+				cout<<" "<<getPlayerName(node->player->pnum)<<node->count<<" |";
 			}
 		}
 		cout<<endl;
+		for(int i=0; i<(this->gameSize)*5+1; i++){
+			cout<<"-";
+		}
+		cout<<endl;
 	}
-	for(int i=0; i<(this->gameSize*2 + this->gameSize+1); i++){
+	for(int i=0; i<(this->gameSize)*5+1; i++){
 		cout<<"x";
 	}
 	cout<<endl;
@@ -174,3 +208,41 @@ void ChainReaction::printRawNodeCount(){
 	}
 	cout<<endl;
 }
+
+void ChainReaction::burstNode(GNodeptr gnode){
+	cout<<"Node Burst"<<endl;
+	gnode->count=0;
+	PNodeptr player = gnode->player;
+	gnode->player = NULL;
+	this->burstLeft(gnode, player);
+	this->burstRight(gnode, player);
+	this->burstUp(gnode, player);
+	this->burstDown(gnode, player);
+	cout<<"Burst Over"<<endl;
+}
+
+void ChainReaction::burstLeft(GNodeptr gnode, PNodeptr player){
+	if(gnode->left == NULL) return;
+	cout<<"Left Burst"<<endl;
+	this->markIndex(player, gnode->left->index);
+}
+
+void ChainReaction::burstRight(GNodeptr gnode, PNodeptr player){
+	if(gnode->right == NULL) return;
+	cout<<"Right Burst"<<endl;
+	this->markIndex(player, gnode->right->index);
+}
+
+void ChainReaction::burstUp(GNodeptr gnode, PNodeptr player){
+	if(gnode->up == NULL) return;
+	cout<<"UP Burst"<<endl;
+	this->markIndex(player, gnode->up->index);
+}
+
+void ChainReaction::burstDown(GNodeptr gnode, PNodeptr player){
+	if(gnode->down == NULL) return;
+	cout<<"Down Burst"<<endl;
+	this->markIndex(player, gnode->down->index);
+}
+
+

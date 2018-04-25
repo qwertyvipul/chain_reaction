@@ -1,5 +1,6 @@
 typedef struct PlayerNode{
-	int player;
+	int pnum;
+	struct PlayerNode* curr;
 	struct PlayerNode* prev;
 	struct PlayerNode* next;
 }PNode;
@@ -10,9 +11,10 @@ typedef PNode* PNodeptr;
 PNodeptr createPlayers(int playerCount){
 	int flag=1; //check if head is to be created
 	PNodeptr head, temp;
-	for(int player=1; player<=playerCount; player++){
+	for(int pnum=1; pnum<=playerCount; pnum++){
 		PNodeptr node = PBOX;
-		node->player = player;
+		node->pnum = pnum;
+		node->curr = node;
 		node->next = NULL;
 		node->prev = NULL;
 		if(flag){
@@ -23,13 +25,16 @@ PNodeptr createPlayers(int playerCount){
 			node->prev = temp;
 		}
 		temp = node;
-		if(player==playerCount) node->next = head;
+		if(pnum==playerCount){
+			node->next = head;
+			head->prev = node;
+		}
 	}
 	return head;
 }
 
-char getPlayerName(int player){
-	switch(player){
+char getPlayerName(int pnum){
+	switch(pnum){
 		case 1:
 			return 'A';
 			break;
