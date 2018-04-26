@@ -9,8 +9,8 @@ class ChainReaction{
 		//forward declarations for nested calls
 		void createGame(); //this will create the game i.e create the players and the game nodes
 		void printRawGame(); //this prints the indexes of the game
-		void printGame(); //this prints the state of the game including the indexes and players associated with the nodes and the count of the node
-		void printRawNodeCount(); //this prints the total count of nodes i.e the total number of balls an index can hold
+		void printGame(); //this prints the state of the game including the indexes and players associated with the nodes and the count of the atoms
+		void printRawNodeCount(); //this prints the total count of nodes i.e the total number of atoms an index can hold
 		void play(); //this will begin the game
 		void markIndex(PNodeptr, int); //to mark the move of the player
 		int gameLeft(); //to check if the game has finished or if still there are some moves available
@@ -135,8 +135,19 @@ void ChainReaction::markIndex(PNodeptr pnode, int index){
 
 //the chain reaction
 void ChainReaction::burstNode(GNodeptr gnode){
+	PNodeptr player = this->firstPlayer; //check if the player has not won already
+	int flag = 1;
+	do{
+		if(this->playerLeft(player) && gnode->player!=player){ //there must a opponent left in the game to proceed further
+			flag = 0;
+			break;
+		}
+		player = player->next;
+	}while(player!=this->firstPlayer);
+	if(flag) return; /* MY FAVOURITE PART OF THE CODE */ //if the player has already won stop the chain reaction
+	
 	gnode->count=0; //the atom count of the bursting node will become zero for the instance
-	PNodeptr player = gnode->player; //get the player and store it in a variable
+	player = gnode->player; //get the player and store it in a variable
 	gnode->player = NULL; //no player will be associated to the bursting node for instance
 	if(gnode->left != NULL) this->markIndex(player, gnode->left->index); //burst to the left
 	if(gnode->right != NULL) this->markIndex(player, gnode->right->index); //burst to the right
