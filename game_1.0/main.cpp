@@ -1,5 +1,6 @@
 #include<iostream>
 #include<stdlib.h>
+#include<conio.h>
 #include<map>
 using namespace std;
 #include "player_node.cpp" //importing the player nodes
@@ -26,6 +27,7 @@ int main(){
 	
 	ChainReaction chainReaction(gameSize, playerCount); //creating a instance of the game
 	chainReaction.play(); //and the game begins
+	cout<<"Press any key to finish: "; getch();
 }
 
 /*
