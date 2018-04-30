@@ -11,6 +11,14 @@ typedef map<int, GNodeptr> GMap; //to map the game index to the game nodes
 int main(){
 	int gameSize, playerCount;
 	int flag=1; //for things that flag does
+	int self=0;
+	
+	char ch;
+	cout<<"Do you want to play with the system(y/n): "; cin>>ch;
+	if(ch=='y'){
+		cout<<"System is player A!"<<endl;
+		self = 1;
+	}
 	
 	while(flag){ //see the flag :-)
 		cout<<"Enter the size of the game (2-10): "; cin>>gameSize; //limiting the game size
@@ -25,7 +33,7 @@ int main(){
 		else cout<<"Opps! Invalid number, please try again"<<endl;
 	}
 	
-	ChainReaction chainReaction(gameSize, playerCount); //creating a instance of the game
+	ChainReaction chainReaction(self, gameSize, playerCount); //creating a instance of the game
 	chainReaction.play(); //and the game begins
 	cout<<"Press any key to finish: "; getch();
 }
