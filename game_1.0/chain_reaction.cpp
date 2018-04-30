@@ -16,9 +16,7 @@ class ChainReaction{
 		int playerLeft(PNodeptr); //to check if the current player has some valid moves in the game to play
 		void burstNode(GNodeptr); //this will start the chain reaction
 		int getBestMove(); //this gives the best move for the system
-		int cornerEmpty(); //checks if an empty corner is present
 		int getEmptyCorner(); //this gives the index of the empty corner
-		int isChain(); //checks if a chain exists
 		int getBurstNode(); //gets the index where the chain exists
 };
 
@@ -210,15 +208,14 @@ void ChainReaction::printGame(){
 int ChainReaction::getBestMove(){
 	int index;
 	
-	if(this->cornerEmpty()==1){ //if empty corner present
-		index = this->getEmptyCorner(); //get the empty corner
-		cout<<"Empty corner: ";
+	index = this->getEmptyCorner(); //get the empty corner
+	if(index<gameSize*gameSize){
+		cout<<"Empty Corner: ";
 		return index;
 	}
-	
-	//check for chains
-	if(this->isChain()==1){ //if chain present
-		index = this->getBurstNode(); //get the chain node
+
+	index = this->getBurstNode(); //get the node if a chain exists
+	if(index<gameSize*gameSize){
 		cout<<"Chain burst: ";
 		return index;
 	}
@@ -231,57 +228,16 @@ int ChainReaction::getBestMove(){
 	return index;
 }
 
-//this checks for the presence of any empty corner
-int ChainReaction::cornerEmpty(){
-	if(gmap[0]->player==NULL || gmap[gameSize-1]->player==NULL || gmap[gameSize*gameSize-gameSize]->player==NULL || gmap[gameSize*gameSize-1]->player==NULL) return 1;
-	return 0;
-}
-
 //this gives the index of the empty corner
 int ChainReaction::getEmptyCorner(){
 	if(gmap[0]->player==NULL) return 0;
 	else if(gmap[gameSize-1]->player==NULL) return gameSize-1;
 	else if(gmap[gameSize*gameSize-gameSize]->player==NULL) return gameSize*gameSize-gameSize;
-	else return gameSize*gameSize-1;
+	else if(gmap[gameSize*gameSize-1]->player==NULL) return gameSize*gameSize-1;
+	else return gameSize*gameSize;
 }
 
-//this checks if any chain is present in the game
-int ChainReaction::isChain(){
-	for(int rownum=0; rownum<gameSize; rownum++){
-		for(int colnum=0; colnum<gameSize; colnum++){
-			int index = rownum*gameSize + colnum;
-			if(gmap[index]->player==this->firstPlayer && gmap[index]->count==gmap[index]->total-1){
-				if(gmap[index]->left!=NULL){
-					GNodeptr node = gmap[index]->left;
-					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
-						return 1;
-					}
-				}
-				if(gmap[index]->right!=NULL){
-					GNodeptr node = gmap[index]->right;
-					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
-						return 1;
-					}
-				}
-				if(gmap[index]->up!=NULL){
-					GNodeptr node = gmap[index]->up;
-					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
-						return 1;
-					}
-				}
-				if(gmap[index]->down!=NULL){
-					GNodeptr node = gmap[index]->down;
-					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
-						return 1;
-					}
-				}
-			}
-		}
-	}
-	return 0;
-}
-
-//this returns the node from where chain exists
+//this gives the best node for the system to make its move
 int ChainReaction::getBurstNode(){
 	for(int rownum=0; rownum<gameSize; rownum++){
 		for(int colnum=0; colnum<gameSize; colnum++){
@@ -314,4 +270,5 @@ int ChainReaction::getBurstNode(){
 			}
 		}
 	}
+	return gameSize*gameSize;
 }
