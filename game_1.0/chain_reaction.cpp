@@ -1,25 +1,30 @@
 class ChainReaction{
+		int self;
 		int gameSize; //the game size (size x size) matrix
 		int playerCount; //number of players
 		GMap gmap; //index to game node map
 		PNodeptr firstPlayer; //the address of the first player to begin with
 		
 	public:
-		ChainReaction(int, int);
+		ChainReaction(int, int, int);
 		//forward declarations for nested calls
 		void createGame(); //this will create the game i.e create the players and the game nodes
-		void printRawGame(); //this prints the indexes of the game
 		void printGame(); //this prints the state of the game including the indexes and players associated with the nodes and the count of the atoms
-		void printRawNodeCount(); //this prints the total count of nodes i.e the total number of atoms an index can hold
 		void play(); //this will begin the game
 		void markIndex(PNodeptr, int); //to mark the move of the player
 		int gameLeft(); //to check if the game has finished or if still there are some moves available
 		int playerLeft(PNodeptr); //to check if the current player has some valid moves in the game to play
 		void burstNode(GNodeptr); //this will start the chain reaction
+		int getBestMove(); //this gives the best move for the system
+		int cornerEmpty(); //checks if an empty corner is present
+		int getEmptyCorner(); //this gives the index of the empty corner
+		int isChain(); //checks if a chain exists
+		int getBurstNode(); //gets the index where the chain exists
 };
 
 //cunstructor to initialize the game
-ChainReaction::ChainReaction(int gameSize, int playerCount){
+ChainReaction::ChainReaction(int self, int gameSize, int playerCount){
+	this->self = self;
 	this->gameSize = gameSize;
 	this->playerCount = playerCount;
 	this->createGame();
@@ -30,9 +35,7 @@ void ChainReaction::createGame(){
 	this->firstPlayer = createPlayers(this->playerCount); //create the players and return the first player
 	GNodeptr up, left;
 	for(int rownum = 0; rownum<this->gameSize; rownum++){
-		if(rownum == 0) up = NULL;
 		for(int colnum = 0; colnum<this->gameSize; colnum++){
-			if(colnum == 0) left = NULL;
 			int index = rownum*gameSize + colnum;
 			GNodeptr node = GBOX; //creating the game nodes
 			gmap[index] = node; //mapping the game nodes
@@ -72,7 +75,12 @@ void ChainReaction::play(){
 		this->printGame();
 		cout<<"Player "<<getPlayerName(pnode->pnum)<<" please enter your index: ";
 		int index;
-		cin>>index;
+		if(this->self==1 && pnode->pnum==1){	
+			index = 0; //first move of the system
+			cout<<index<<endl;
+		}else{	
+			cin>>index;
+		}
 		while(index>=this->gameSize*this->gameSize || this->gmap[index]->player!=0){
 			cout<<"Please choose a valid index: "; cin>>index;
 		}
@@ -86,8 +94,14 @@ void ChainReaction::play(){
 			this->printGame();
 			cout<<"Player "<<getPlayerName(pnode->pnum)<<" please enter your index: ";
 			int index;
-			cin>>index;
-			while(index>=this->gameSize*this->gameSize || this->gmap[index]->count == this->gmap[index]->total || (this->gmap[index]->player!=NULL && this->gmap[index]->player!=pnode)){
+			if(this->self==1 && pnode->pnum==1){ //if system turn	
+				index = this->getBestMove(); //gets the best move
+				cout<<index<<endl;
+			}else{	
+				cin>>index;
+			}
+			
+			while(index>=this->gameSize*this->gameSize || (this->gmap[index]->player!=NULL && this->gmap[index]->player!=pnode)){
 				cout<<"Please choose a valid index: "; cin>>index;
 			}
 			this->markIndex(pnode, index);
@@ -190,4 +204,114 @@ void ChainReaction::printGame(){
 		cout<<"x";
 	}
 	cout<<endl;
+}
+
+//this will give the best move available for the system
+int ChainReaction::getBestMove(){
+	int index;
+	
+	if(this->cornerEmpty()==1){ //if empty corner present
+		index = this->getEmptyCorner(); //get the empty corner
+		cout<<"Empty corner: ";
+		return index;
+	}
+	
+	//check for chains
+	if(this->isChain()==1){ //if chain present
+		index = this->getBurstNode(); //get the chain node
+		cout<<"Chain burst: ";
+		return index;
+	}
+	
+	//generate random move
+	do{
+		index = (rand()%(this->gameSize*gameSize));
+	}while(index>=this->gameSize*this->gameSize || (this->gmap[index]->player!=NULL && this->gmap[index]->player!=this->firstPlayer));
+	cout<<"Random move: ";
+	return index;
+}
+
+//this checks for the presence of any empty corner
+int ChainReaction::cornerEmpty(){
+	if(gmap[0]->player==NULL || gmap[gameSize-1]->player==NULL || gmap[gameSize*gameSize-gameSize]->player==NULL || gmap[gameSize*gameSize-1]->player==NULL) return 1;
+	return 0;
+}
+
+//this gives the index of the empty corner
+int ChainReaction::getEmptyCorner(){
+	if(gmap[0]->player==NULL) return 0;
+	else if(gmap[gameSize-1]->player==NULL) return gameSize-1;
+	else if(gmap[gameSize*gameSize-gameSize]->player==NULL) return gameSize*gameSize-gameSize;
+	else return gameSize*gameSize-1;
+}
+
+//this checks if any chain is present in the game
+int ChainReaction::isChain(){
+	for(int rownum=0; rownum<gameSize; rownum++){
+		for(int colnum=0; colnum<gameSize; colnum++){
+			int index = rownum*gameSize + colnum;
+			if(gmap[index]->player==this->firstPlayer && gmap[index]->count==gmap[index]->total-1){
+				if(gmap[index]->left!=NULL){
+					GNodeptr node = gmap[index]->left;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return 1;
+					}
+				}
+				if(gmap[index]->right!=NULL){
+					GNodeptr node = gmap[index]->right;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return 1;
+					}
+				}
+				if(gmap[index]->up!=NULL){
+					GNodeptr node = gmap[index]->up;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return 1;
+					}
+				}
+				if(gmap[index]->down!=NULL){
+					GNodeptr node = gmap[index]->down;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return 1;
+					}
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+//this returns the node from where chain exists
+int ChainReaction::getBurstNode(){
+	for(int rownum=0; rownum<gameSize; rownum++){
+		for(int colnum=0; colnum<gameSize; colnum++){
+			int index = rownum*gameSize + colnum;
+			if(gmap[index]->player==this->firstPlayer && gmap[index]->count==gmap[index]->total-1){
+				if(gmap[index]->left!=NULL){
+					GNodeptr node = gmap[index]->left;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return index;
+					}
+				}
+				if(gmap[index]->right!=NULL){
+					GNodeptr node = gmap[index]->right;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return index;
+					}
+				}
+				if(gmap[index]->up!=NULL){
+					GNodeptr node = gmap[index]->up;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return index;
+					}
+				}
+				if(gmap[index]->down!=NULL){
+					GNodeptr node = gmap[index]->down;
+					if(node->player!=NULL && node->player!=this->firstPlayer && node->count==node->total-1){
+						return index;
+					}
+				}
+			}
+		}
+	}
 }
