@@ -8,7 +8,9 @@ The game uses the some of the concepts of the basic data structures such as:
 
 Some of the libraries we used besides the common iostream and conio libraries:
 
-> map -> To map the game nodes to integers for direct access instead of using search function.
+> <strong>map</strong><br/>
+-> To map the game nodes to integers for direct access instead of using search function.
 
-> stdlib -> Most importantly to generate random integers to mark the moves of the self playing bot.<br/>
-         -> Make use of the system function to associate players with a color.
+> <strong>stdlib</strong><br/>
+-> Most importantly to generate random integers to mark the moves of the self playing bot.<br/>
+-> Make use of the system function to associate players with a color.
