@@ -1,4 +1,6 @@
-# cpp_chain_reaction
+# C++ Chain Reaction Game
+[Contributors](AUTHORS.md)<br/>
+
 Chain Reaction multipayer game to demostrate the usage and applications of Data Structures using C++.
 
 The game uses the some of the concepts of the basic data structures such as:
